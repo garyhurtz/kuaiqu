@@ -1,8 +1,9 @@
 # -*- coding: UTF-8 -*-
 import string
+
 import pytest
+
 from kuaiqu import Kuaiqu
-from collections import OrderedDict
 
 
 @pytest.fixture
@@ -19,5 +20,3 @@ def test_can_iterate(dut):
 
     for key in dut.keys():
         assert isinstance(key, str)
-
-

@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 import string
+
 import pytest
+
 from kuaiqu import Kuaiqu
 
 
@@ -20,5 +22,3 @@ def test_can_pop(dut):
 
     assert isinstance(key, str)
     assert isinstance(val, int)
-
-

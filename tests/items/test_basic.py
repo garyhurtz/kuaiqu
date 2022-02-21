@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 import string
+
 import pytest
+
 from kuaiqu import Kuaiqu
 
 

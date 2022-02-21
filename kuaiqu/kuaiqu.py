@@ -2,17 +2,27 @@
 import itertools
 from collections import OrderedDict
 from datetime import datetime, timedelta
+from typing import Any, Iterator, Optional, Set
 
 
 class Kuaiqu(object):
-
-    def __init__(self, maxsize=50, hysteresis=10, rolling=None, expiration=None, **kwargs):
+    def __init__(
+        self,
+        maxsize: int = 50,
+        hysteresis: int = 10,
+        rolling: Optional[int] = None,
+        expiration: Optional[int] = None,
+        **kwargs
+    ) -> None:
         """
 
         :param maxsize: the maximum number of items in the cache
-        :param hysteresis: the number of oldest items to remove when cache overflows
-        :param rolling: the number of minutes to wait between accesses before expiring, or None
-        :param expiration: the maximum number of minutes an obj can exist in the cache, else no expiration if None
+        :param hysteresis: the number of oldest items to remove when cache
+        overflows
+        :param rolling: the number of minutes to wait between accesses
+        before expiring, or None
+        :param expiration: the maximum number of minutes an obj can exist
+        in the cache, else no expiration if None
         :param kwargs:
         """
 
@@ -26,7 +36,7 @@ class Kuaiqu(object):
         self.rolling = timedelta(minutes=rolling) if rolling else None
         self.expiration = timedelta(minutes=expiration) if expiration else None
 
-    def __len__(self):
+    def __len__(self) -> int:
         """
         Return the number of items in the cache.
 
@@ -36,7 +46,7 @@ class Kuaiqu(object):
         """
         return len(self.cache)
 
-    def __contains__(self, key):
+    def __contains__(self, key) -> bool:
         """
         Return True if key in cache.
 
@@ -47,7 +57,7 @@ class Kuaiqu(object):
         """
         return key in self.cache
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[tuple[str, Any]]:
         """
         Return an iterator over (key, value) pairs stored in the cache.
 
@@ -56,16 +66,16 @@ class Kuaiqu(object):
         """
         return self.items()
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key: str, value: Any) -> None:
         self.set(key, value)
 
-    def __getitem__(self, key):
+    def __getitem__(self, key: str) -> Any:
         return self.get(key)
 
-    def __delitem__(self, key):
+    def __delitem__(self, key: str) -> None:
         self.delete(key)
 
-    def keys(self):
+    def keys(self) -> Set[str]:
         """
         Return keys in the cache
 
@@ -73,18 +83,15 @@ class Kuaiqu(object):
         """
         return self.cache.keys()
 
-    def items(self):
+    def items(self) -> Iterator[tuple[str, Any]]:
         """
         Return an iterator over (key, val) pairs in the cache
 
         :return:
         """
-        return (
-            (key, obj)
-            for key, (rolling, expiration, obj) in self.cache.items()
-        )
+        return ((key, obj) for key, (rolling, expiration, obj) in self.cache.items())
 
-    def pop(self, key):
+    def pop(self, key: str) -> Any:
         """
         Remove and return key from cache
 
@@ -96,7 +103,7 @@ class Kuaiqu(object):
 
         return obj
 
-    def popitem(self, last=True):
+    def popitem(self, last: bool = True) -> tuple[str, Any]:
         """
         Pop an item and return it directly
 
@@ -106,11 +113,11 @@ class Kuaiqu(object):
         :return:
         """
 
-        key, (rolling, expiration, obj) = self.cache.popitem(last=last)
+        key, (_, _, obj) = self.cache.popitem(last=last)
 
         return key, obj
 
-    def set(self, key, obj):
+    def set(self, key: str, obj: Any) -> None:
         """
         Store obj under key, with optional expiration.
 
@@ -133,7 +140,9 @@ class Kuaiqu(object):
 
         else:
 
-            expiration = datetime.utcnow() + self.expiration if self.expiration else None
+            expiration = (
+                datetime.utcnow() + self.expiration if self.expiration else None
+            )
 
             # assign the packed value
             self.cache[key] = (rolling, expiration, obj)
@@ -144,12 +153,13 @@ class Kuaiqu(object):
                 # if still too big, then trim back to lower_bound
                 self.prune(expired=True, length=True)
 
-    def get(self, key):
+    def get(self, key: str) -> Any:
         """
         Retrieve an item from the cache
 
         :param key: the key to retrieve
-        :return: the value stored under key, else None if it doesnt exist or has expired
+        :return: the value stored under key, else None if it doesn't
+        exist or has expired
         """
 
         # retrieve the packed value
@@ -157,7 +167,10 @@ class Kuaiqu(object):
 
         # print(rolling, expiration, obj)
 
-        if any(limit is not None and limit <= datetime.utcnow() for limit in (rolling, expiration)):
+        if any(
+            limit is not None and limit <= datetime.utcnow()
+            for limit in (rolling, expiration)
+        ):
 
             # key expired, so remove it
             self.delete(key)
@@ -169,7 +182,7 @@ class Kuaiqu(object):
 
         return obj
 
-    def _prune_length(self):
+    def _prune_length(self) -> None:
         """
         Prune cache size down to lower bound
 
@@ -184,7 +197,7 @@ class Kuaiqu(object):
         for key in deletes:
             self.delete(key)
 
-    def _prune_expired(self):
+    def _prune_expired(self) -> None:
         """
         Remove any expired items from the cache
 
@@ -197,18 +210,22 @@ class Kuaiqu(object):
         deletes = {
             key
             for key, (rolling, expiration, obj) in self.cache.items()
-            if any(limit is not None and limit <= datetime.utcnow() for limit in (rolling, expiration))
+            if any(
+                limit is not None and limit <= datetime.utcnow()
+                for limit in (rolling, expiration)
+            )
         }
 
         # now delete them
         for key in deletes:
             self.delete(key)
 
-    def prune(self, expired=True, length=True):
+    def prune(self, expired: bool = True, length: bool = True) -> None:
         """
         Remove items from the cache.
 
-        Remove expired items first, then only remove unexpired items if there are too many of them.
+        Remove expired items first, then only remove unexpired items if there
+        are too many of them.
 
         :param expired:
         :param length:
@@ -220,7 +237,7 @@ class Kuaiqu(object):
         if length:
             self._prune_length()
 
-    def delete(self, key):
+    def delete(self, key: str) -> None:
         """
         Delete key from cache
 
@@ -229,11 +246,9 @@ class Kuaiqu(object):
         """
         self.cache.pop(key, None)
 
-    def clear(self):
+    def clear(self) -> None:
         """
         Remove all items from the cache
         :return:
         """
         self.cache.clear()
-
-

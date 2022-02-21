@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 import string
+
 import pytest
+
 from kuaiqu import Kuaiqu
 
 
@@ -16,7 +18,6 @@ def dut():
 
 @pytest.fixture
 def result(dut):
-
     def function(**kwargs):
         return kwargs
 
@@ -29,4 +30,3 @@ def test_len(result):
 
 def test_type(result):
     assert isinstance(result, dict)
-

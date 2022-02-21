@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 import string
+
 import pytest
+
 from kuaiqu import Kuaiqu
 
 
@@ -21,4 +23,3 @@ def test_prune(dut):
     dut.prune()
 
     assert len(dut) == 10
-

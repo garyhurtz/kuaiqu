@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 import string
+
 import pytest
+
 from kuaiqu import Kuaiqu
 
 
@@ -16,14 +18,13 @@ def dut():
 
 def test_can_pop(dut):
 
-    val = dut.pop('a')
+    val = dut.pop("a")
 
     assert val == 0
 
 
 def test_pop_missing(dut):
 
-    val = dut.pop('wrong')
+    val = dut.pop("wrong")
 
     assert val is None
-

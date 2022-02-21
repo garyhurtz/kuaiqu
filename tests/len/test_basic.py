@@ -1,6 +1,8 @@
 # -*- coding: UTF-8 -*-
 import string
+
 import pytest
+
 from kuaiqu import Kuaiqu
 
 
@@ -17,5 +19,3 @@ def dut():
 def test_len(dut):
 
     assert len(dut) == 10
-
-

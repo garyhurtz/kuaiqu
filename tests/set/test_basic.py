@@ -1,5 +1,6 @@
 # -*- coding: UTF-8 -*-
 import pytest
+
 from kuaiqu import Kuaiqu
 
 
@@ -34,4 +35,3 @@ def test_on_overflow(dut):
 
     # the most recent items are still there
     assert dut.popitem() == (24, 24)
-
