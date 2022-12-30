@@ -1,8 +1,11 @@
 # -*- coding: UTF-8 -*-
+from __future__ import annotations
+
 import itertools
 from collections import OrderedDict
+from collections.abc import Iterator
 from datetime import datetime, timedelta
-from typing import Any, Iterator, Optional, Set, Tuple
+from typing import Any
 
 
 class Kuaiqu(object):
@@ -14,9 +17,9 @@ class Kuaiqu(object):
         self,
         maxsize: int = 50,
         hysteresis: int = 10,
-        rolling: Optional[int] = None,
-        expiration: Optional[int] = None,
-        **kwargs
+        rolling: int | None = None,
+        expiration: int | None = None,
+        **kwargs,
     ) -> None:
         """
 
@@ -29,22 +32,25 @@ class Kuaiqu(object):
             the number of oldest items to remove when cache overflows
 
         **rolling**: int, optional
-            the number of minutes to wait between accesses before expiring, or None
+            the number of minutes to wait between accesses before expiring,
+            or None
 
         **expiration**: int, optional
-            the maximum number of minutes an obj can exist in the cache, else no expiration if None
+            the maximum number of minutes an obj can exist in the cache,
+            else no expiration if None
 
         **kwargs**:
             optional keyword args
         """
 
         self.cache: OrderedDict[
-            str, Tuple[Optional[datetime], Optional[datetime], Any]
+            str, tuple[datetime | None, datetime | None, Any]
         ] = OrderedDict(**kwargs)
         """
         The actual cache.
 
-        Values are stored in the cache as a 3-tuple of the form: (rolling, expiration, obj)
+        Values are stored in the cache as a 3-tuple of the form:
+        (rolling, expiration, obj)
         """
 
         self.upper_bound: int = maxsize
@@ -54,7 +60,8 @@ class Kuaiqu(object):
 
         self.lower_bound: int = maxsize - hysteresis
         """
-        The maximum number of items that will remain in the queue after trimming.
+        The maximum number of items that will remain in the queue after
+        trimming.
         """
 
         self.rolling: timedelta = timedelta(minutes=rolling) if rolling else None
@@ -143,7 +150,7 @@ class Kuaiqu(object):
         """
         self.delete(key)
 
-    def keys(self) -> Set[str]:
+    def keys(self) -> set[str]:
         """
         Returns:
             The set of keys in the cache
@@ -241,7 +248,8 @@ class Kuaiqu(object):
 
         Returns:
 
-        The value stored under key, else None if it does not exist or has expired
+        The value stored under key, else None if it does not exist or has
+        expired
         """
 
         # retrieve the packed value
