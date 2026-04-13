@@ -4,6 +4,6 @@ pip==26.0
 pipdeptree==2.3.3
 pylint==2.15.9
 pyparsing==3.0.9
-pytest==7.2.0
+pytest==9.0.3
 setuptools==78.1.1
 toml==0.10.2
