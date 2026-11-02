@@ -2,7 +2,7 @@ flake8==6.0.0
 mypy==0.991
 pip==26.2
 pipdeptree==2.3.3
-pylint==2.15.9
+pylint==4.0.9
 pyparsing==3.0.9
 pytest==9.0.3
 setuptools==84.1.0
